@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Ma Trận Tô Màu 20-10 - HĐTN 10</title>
+  <style>
+    :root {
+      --primary: #8b5cf6;
+      --primary-dark: #6d28d9;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --border: #e2e8f0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 12px;
+    }
+    .header {
+      background: #fff;
+      padding: 16px;
+      border-radius: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.06);
+      margin-bottom: 16px;
+      border: 1px solid var(--border);
+      text-align: center;
+    }
+    .badge {
+      display: inline-block;
+      background: #fdf2f8;
+      color: #db2777;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      margin-bottom: 8px;
+    }
+    h1 {
+      font-size: 20px;
+      color: #9d174d;
+      margin-bottom: 6px;
+    }
+    .sub-title {
+      font-size: 13px;
+      color: #64748b;
+      margin-bottom: 12px;
+    }
+    .student-info {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .student-info input {
+      padding: 6px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+      width: 170px;
+    }
+    .layout-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    @media (min-width: 900px) {
+      .layout-container {
+        flex-direction: row;
+        align-items: flex-start;
+      }
+      .matrix-panel {
+        position: sticky;
+        top: 16px;
+        width: 440px;
+        flex-shrink: 0;
+      }
+      .questions-panel {
+        flex: 1;
+      }
+    }
+    .card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.06);
+      border: 1px solid var(--border);
+    }
+    .panel-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    /* Matrix styling */
+    .matrix-grid {
+      display: grid;
+      grid-template-columns: repeat(20, 1fr);
+      gap: 2px;
+      background: #cbd5e1;
+      padding: 4px;
+      border-radius: 8px;
+      user-select: none;
+      aspect-ratio: 20 / 16;
+    }
+    .cell {
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 10px;
+      color: #64748b;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+    @media (max-width: 450px) {
+      .cell { font-size: 8px; }
+      .matrix-grid { gap: 1px; padding: 2px; }
+    }
+    /* Legend */
+    .legend-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      justify-content: center;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    /* Score banner */
+    .score-banner {
+      background: #eef2ff;
+      border: 1px solid #c7d2fe;
+      color: #3730a3;
+      padding: 10px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      font-weight: 600;
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    /* Questions styling */
+    .q-item {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 14px;
+      transition: all 0.2s ease;
+    }
+    .q-item.correct {
+      border-color: #86efac;
+      background: #f0fdf4;
+    }
+    .q-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #0f172a;
+      margin-bottom: 10px;
+    }
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+    @media (min-width: 600px) {
+      .options-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    .btn-opt {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      padding: 10px 12px;
+      border-radius: 10px;
+      text-align: left;
+      font-size: 13px;
+      color: #334155;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s ease;
+      width: 100%;
+    }
+    .btn-opt:active {
+      transform: scale(0.98);
+    }
+    .btn-opt .key-tag {
+      font-weight: 800;
+      background: #e2e8f0;
+      color: #1e293b;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+    .btn-opt.chosen-correct {
+      background: #22c55e !important;
+      color: #ffffff !important;
+      border-color: #16a34a !important;
+      font-weight: 600;
+    }
+    .btn-opt.chosen-correct .key-tag {
+      background: #ffffff;
+      color: #16a34a;
+    }
+    .btn-opt.chosen-wrong {
+      background: #ef4444 !important;
+      color: #ffffff !important;
+      border-color: #dc2626 !important;
+    }
+    .btn-opt.chosen-wrong .key-tag {
+      background: #ffffff;
+      color: #dc2626;
+    }
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .action-btn {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      text-align: center;
+      display: inline-block;
+      text-decoration: none;
+    }
+    .btn-print {
+      background: #0284c7;
+      color: #fff;
+    }
+    .btn-reset {
+      background: #e2e8f0;
+      color: #334155;
+    }
+    /* IN ẤN / XUẤT GIẤY */
+    @media print {
+      body {
+        background: #fff;
+        padding: 0;
+        color: #000;
+      }
+      .no-print, .actions {
+        display: none !important;
+      }
+      .layout-container {
+        display: block;
+      }
+      .card {
+        box-shadow: none;
+        border: none;
+        padding: 4px;
+      }
+      .matrix-panel {
+        width: 100% !important;
+        margin-bottom: 20px;
+        page-break-after: avoid;
+      }
+      .matrix-grid {
+        max-width: 500px;
+        margin: 0 auto;
+        background: #94a3b8;
+      }
+      .cell {
+        color: #000;
+        border: 1px solid #ccc;
+      }
+      .q-item {
+        break-inside: avoid;
+        border: 1px solid #e2e8f0;
+        margin-bottom: 10px;
+        padding: 8px;
+      }
+      .btn-opt {
+        border: 1px solid #ccc;
+        background: #fff !important;
+        color: #000 !important;
+      }
+      .score-banner { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="badge">🌸 CHỦ ĐỀ 20-10: TRI ÂN NGÀY PHỤ NỮ VIỆT NAM</div>
+    <h1>PHIẾU HỌC TẬP: MA TRẬN SẮC MÀU</h1>
+    <div class="sub-title">Chủ đề 2: Khám phá và phát triển bản thân — HĐTN & Hướng nghiệp lớp 10</div>
+    <div class="student-info">
+      <input type="text" placeholder="Họ và tên học sinh...">
+      <input type="text" placeholder="Lớp: 10A...">
+    </div>
+  </div>
+
+  <div class="layout-container">
+    <!-- PANEL MA TRẬN -->
+    <div class="matrix-panel">
+      <div class="card">
+        <div class="panel-title">
+          <span>BẢNG MẬT MÃ TÔ MÀU</span>
+          <span id="progress-text" style="color: #6366f1;">0/20 câu đúng</span>
+        </div>
+
+        <div class="matrix-grid" id="matrix"></div>
+
+        <div class="legend-list">
+          <div class="legend-item"><span class="dot" style="background:#ec4899"></span> O: Hồng</div>
+          <div class="legend-item"><span class="dot" style="background:#8b5cf6"></span> H: Tím</div>
+          <div class="legend-item"><span class="dot" style="background:#eab308"></span> R: Vàng</div>
+          <div class="legend-item"><span class="dot" style="background:#ef4444"></span> T, A, B: Đỏ</div>
+          <div class="legend-item"><span class="dot" style="background:#22c55e"></span> I, N: Xanh lá</div>
+          <div class="legend-item"><span class="dot" style="background:#f97316"></span> Y: Cam</div>
+          <div class="legend-item"><span class="dot" style="background:#0ea5e9"></span> C: Xanh dương</div>
+        </div>
+
+        <div class="actions no-print">
+          <button class="action-btn btn-print" onclick="window.print()">🖨️ In ra giấy / Lưu PDF</button>
+          <button class="action-btn btn-reset" onclick="resetGame()">Làm lại</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL CÂU HỎI -->
+    <div class="questions-panel">
+      <div class="card">
+        <div class="score-banner">
+          <span>🎯 Hãy chọn đáp án đúng để mở màu trên ma trận</span>
+          <span id="score-val">Điểm: 0/20</span>
+        </div>
+        <div id="questions-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 16 dòng x 20 cột
+    const rawMatrix = [
+      "PUQEKWWGUXZJFVVMMEJJ",
+      "JDVXOXXOOJDQDUHHWHHX",
+      "MZUOOOOOOOUWHHHHHHHK",
+      "VXSOOOROOOPTTGHHHRHH",
+      "PQPFOOOOOETYTYTMHHHH",
+      "KMGLKIIIDJTYYTGSNNNJ",
+      "ULLZUMIIWJLTTGLDNNSU",
+      "QZVLZGKIIMIIVNNNLMLM",
+      "SGXUGKXDVSFQGZKFVEVE",
+      "JTTTBVRRRRJPGXAADUCC",
+      "MGPJBURUSRZFGAAQMCWC",
+      "MBBBBDRPFRUYYQAACMIC",
+      "KBXEJERDZRZFZLAAMXCK",
+      "VBBBBQRRRRWFFSAAAACO",
+      "EVJZFPPSEXXXKUVGVEUC",
+      "EQSIIIIIIIIINNNNNNNC"
+    ];
+
+    const colorMap = {
+      'O': '#ec4899', // Hồng (Cánh hoa 1)
+      'H': '#8b5cf6', // Tím (Cánh hoa 2)
+      'R': '#eab308', // Vàng (Nhụy)
+      'T': '#ef4444', // Đỏ (Đài hoa)
+      'I': '#22c55e', // Xanh lá (Cuống/Lá 1)
+      'N': '#16a34a', // Xanh lá (Cuống/Lá 2)
+      'B': '#dc2626', // Đỏ (Số 2)
+      'Y': '#f97316', // Cam (Số 0)
+      'A': '#ef4444', // Đỏ (Số 1)
+      'C': '#0ea5e9'  // Xanh dương (Số 0)
+    };
+
+    const questions = [
+      {
+        q: "Câu 1: Yếu tố nào sau đây thể hiện rõ nét tính cách tự chủ của học sinh?",
+        opts: [
+          { key: "O", text: "Luôn tự giác lập và thực hiện kế hoạch học tập cá nhân" },
+          { key: "L", text: "Làm theo mọi quyết định và phụ thuộc bạn bè" },
+          { key: "M", text: "Chỉ học khi bị nhắc nhở, kiểm tra khắt khe" },
+          { key: "W", text: "Thường xuyên trì hoãn bài tập đến hạn chót" }
+        ],
+        ans: "O"
+      },
+      {
+        q: "Câu 2: Biểu hiện nào sau đây là minh chứng của người có lòng tự trọng?",
+        opts: [
+          { key: "O", text: "Giữ đúng lời hứa, trung thực và dũng cảm nhận lỗi" },
+          { key: "J", text: "Đổ lỗi cho hoàn cảnh mỗi khi gặp sai sót" },
+          { key: "K", text: "Tự mãn và không bao giờ tiếp thu góp ý" },
+          { key: "E", text: "Tự ti, luôn giấu kín ý kiến của bản thân" }
+        ],
+        ans: "O"
+      },
+      {
+        q: "Câu 3: Khi nhận thấy bản thân dễ nổi nóng trong tranh luận, em nên làm gì?",
+        opts: [
+          { key: "H", text: "Hít thở sâu, bình tĩnh lắng nghe và suy nghĩ thấu đáo" },
+          { key: "D", text: "Tránh né, không bao giờ tham gia thảo luận nhóm" },
+          { key: "F", text: "Cố nói thật to để áp đảo và giành phần thắng" },
+          { key: "G", text: "Xem như bản tính và không cần sửa chữa" }
+        ],
+        ans: "H"
+      },
+      {
+        q: "Câu 4: Biểu hiện của tư duy tích cực khi gặp thất bại trong học tập là:",
+        opts: [
+          { key: "H", text: "Rút ra bài học kinh nghiệm để điều chỉnh phương pháp học" },
+          { key: "Q", text: "Chán nản, bỏ cuộc và không còn hứng thú" },
+          { key: "X", text: "Oán trách đề thi khó hoặc thầy cô chấm nghiêm" },
+          { key: "Z", text: "Tin rằng bản thân kém cỏi, không thể tiến bộ" }
+        ],
+        ans: "H"
+      },
+      {
+        q: "Câu 5: Cách tốt nhất để khám phá năng khiếu và sở trường của bản thân là gì?",
+        opts: [
+          { key: "R", text: "Tích cực trải nghiệm hoạt động và tiếp thu phản hồi thực tế" },
+          { key: "S", text: "Chờ đến khi ra trường mới bắt đầu tìm hiểu" },
+          { key: "U", text: "Bắt chước mọi sở thích từ nhóm bạn xung quanh" },
+          { key: "V", text: "Chỉ tin vào bài trắc nghiệm vui trên mạng" }
+        ],
+        ans: "R"
+      },
+      {
+        q: "Câu 6: Ý nghĩa quan trọng nhất của việc lập kế hoạch phát triển bản thân là:",
+        opts: [
+          { key: "R", text: "Xác định rõ mục tiêu và lộ trình rèn luyện từng bước" },
+          { key: "B", text: "Để thể hiện và khoe khoang với bạn bè" },
+          { key: "C", text: "Tạo áp lực nặng nề để bắt bản thân làm việc" },
+          { key: "P", text: "Chỉ để nộp báo cáo cho thầy cô đánh giá" }
+        ],
+        ans: "R"
+      },
+      {
+        q: "Câu 7: Người có khả năng thấu hiểu cảm xúc và giao tiếp khéo léo sở hữu năng lực nổi bật nào?",
+        opts: [
+          { key: "T", text: "Năng lực tương tác liên cá nhân và trí tuệ cảm xúc" },
+          { key: "F", text: "Năng lực tư duy logic - giải thuật máy tính tính" },
+          { key: "M", text: "Năng lực vận động thể chất cơ học" },
+          { key: "K", text: "Năng lực thị giác - hội họa không gian" }
+        ],
+        ans: "T"
+      },
+      {
+        q: "Câu 8: Tiêu chí SMART yêu cầu mục tiêu cá nhân phải đảm bảo điều gì?",
+        opts: [
+          { key: "T", text: "Cụ thể, đo lường được, có tính khả thi và có thời hạn" },
+          { key: "L", text: "Càng viển vông, to tát và khó đạt càng tốt" },
+          { key: "W", text: "Dựa hoàn toàn vào ý muốn áp đặt của người khác" },
+          { key: "Z", text: "Không cần giới hạn mốc thời gian hoàn thành" }
+        ],
+        ans: "T"
+      },
+      {
+        q: "Câu 9: Thói quen nào giúp rèn luyện sự tự tin khi phát biểu trước tập thể?",
+        opts: [
+          { key: "I", text: "Soạn kỹ dàn ý và tích cực tập thuyết trình trước gương" },
+          { key: "A", text: "Học vẹt từng chữ và đọc đều đều không cảm xúc" },
+          { key: "D", text: "Nhìn xuống chân suốt buổi để tránh ánh mắt người nghe" },
+          { key: "Y", text: "Uống thuốc an thần hoặc các chất kích thích" }
+        ],
+        ans: "I"
+      },
+      {
+        q: "Câu 10: Nhận diện hệ giá trị của bản thân giúp em điều gì?",
+        opts: [
+          { key: "I", text: "Định hướng hành vi và đưa ra các lựa chọn chuẩn mực" },
+          { key: "Q", text: "Tự cho mình quyền phán xét người khác" },
+          { key: "G", text: "Tránh khỏi mọi sai sót và trở ngại trong đời" },
+          { key: "E", text: "Trở nên cứng nhắc và khó hòa nhập" }
+        ],
+        ans: "I"
+      },
+      {
+        q: "Câu 11: Biện pháp giảm stress hiệu quả và lành mạnh nhất là:",
+        opts: [
+          { key: "N", text: "Cân bằng sinh hoạt, tập thể thao và tâm sự cùng người thân" },
+          { key: "J", text: "Thức khuya chơi game thâu đêm để quên áp lực" },
+          { key: "M", text: "Tự đóng cửa phòng cách ly không trò chuyện với ai" },
+          { key: "V", text: "Bỏ bê bài vở và tìm đến thức uống có cồn" }
+        ],
+        ans: "N"
+      },
+      {
+        q: "Câu 12: Hành động nào chứng minh bạn là người có trách nhiệm với chính mình?",
+        opts: [
+          { key: "N", text: "Tự giác chăm sóc sức khỏe và chịu trách nhiệm với việc mình làm" },
+          { key: "P", text: "Để gia đình làm thay mọi công việc cá nhân" },
+          { key: "U", text: "Luôn tìm lý do đổ lỗi khi phạm lỗi" },
+          { key: "X", text: "Sống buông thả vì cho rằng còn quá trẻ" }
+        ],
+        ans: "N"
+      },
+      {
+        q: "Câu 13: Trong ma trận Eisenhower, nhóm việc 'Quan trọng nhưng Không khẩn cấp' cần được:",
+        opts: [
+          { key: "B", text: "Lên lịch trình cụ thể và chủ động thực hiện đều đặn" },
+          { key: "S", text: "Gạt bỏ vì chưa gây ra hậu quả ngay lập tức" },
+          { key: "K", text: "Đùn đẩy hoàn toàn cho người khác xử lý" },
+          { key: "L", text: "Chờ đến khi hạn chót mới gấp rút làm" }
+        ],
+        ans: "B"
+      },
+      {
+        q: "Câu 14: Kỹ năng nào giúp bạn duy trì động lực bền bỉ ngay cả khi không có ai thúc giục?",
+        opts: [
+          { key: "B", text: "Kỹ năng tạo động lực nội tại và quản lý cảm xúc bản thân" },
+          { key: "F", text: "Đòi hỏi phần thưởng vật chất từ cha mẹ" },
+          { key: "Z", text: "Kỹ năng xin xỏ để kéo dài thời hạn nộp bài" },
+          { key: "W", text: "Tự an ủi bằng cách so sánh với người kém hơn" }
+        ],
+        ans: "B"
+      },
+      {
+        q: "Câu 15: Thói quen nào bồi dưỡng tư duy phản biện sắc bén?",
+        opts: [
+          { key: "Y", text: "Luôn đặt câu hỏi tìm nguyên nhân và phân tích đa chiều" },
+          { key: "E", text: "Tin tưởng mù quáng vào mọi tin tức trên mạng" },
+          { key: "G", text: "Phản bác vô cớ mọi ý kiến đối lập để chứng tỏ" },
+          { key: "T", text: "Chỉ dựa vào cảm tính cá nhân thay vì bằng chứng" }
+        ],
+        ans: "Y"
+      },
+      {
+        q: "Câu 16: Tôn trọng sự khác biệt của bạn bè trong lớp được thể hiện qua việc:",
+        opts: [
+          { key: "Y", text: "Bao dung, cởi mở đón nhận cá tính và quan điểm riêng" },
+          { key: "M", text: "Ép buộc người khác phải có chung sở thích với mình" },
+          { key: "U", text: "Chế giễu ngoại hình hoặc sở thích khác biệt của bạn" },
+          { key: "D", text: "Cô lập những ai không cùng hoàn cảnh sống" }
+        ],
+        ans: "Y"
+      },
+      {
+        q: "Câu 17: Khi phát hiện mình có niềm say mê nghệ thuật/nhiếp ảnh, em nên:",
+        opts: [
+          { key: "A", text: "Tham gia các câu lạc bộ để học hỏi và trau dồi thêm" },
+          { key: "J", text: "Dấu kín vì sợ bị bạn bè chê cười" },
+          { key: "K", text: "Bỏ hẳn các môn văn hóa trên lớp để chuyên tâm vẽ" },
+          { key: "L", text: "Nghĩ mình đã giỏi nên không cần học hỏi thêm" }
+        ],
+        ans: "A"
+      },
+      {
+        q: "Câu 18: Yếu tố nào là nguồn sức mạnh nội tại giúp ta vượt qua nghịch cảnh?",
+        opts: [
+          { key: "A", text: "Nghị lực sống, sự bền bỉ và niềm tin vào chính mình" },
+          { key: "V", text: "Sự bao bọc, làm thay từ nhỏ của gia đình" },
+          { key: "P", text: "Sự giàu có về vật chất của bố mẹ" },
+          { key: "S", text: "Vận may ngẫu nhiên trong cuộc sống" }
+        ],
+        ans: "A"
+      },
+      {
+        q: "Câu 19: Phương pháp Pomodoro (học 25 phút, nghỉ 5 phút) rèn luyện năng lực nào?",
+        opts: [
+          { key: "C", text: "Khả năng quản lý thời gian và duy trì sự tập trung cao" },
+          { key: "F", text: "Kỹ năng hùng biện trước tập thể" },
+          { key: "Q", text: "Khả năng ghi nhớ bằng hình ảnh" },
+          { key: "Z", text: "Kỹ năng kiềm chế tức giận" }
+        ],
+        ans: "C"
+      },
+      {
+        q: "Câu 20: Yếu tố then chốt để xây dựng hình ảnh bản thân tích cực, được yêu mến là:",
+        opts: [
+          { key: "C", text: "Sống chân thành, có tinh thần trách nhiệm và lòng nhân ái" },
+          { key: "M", text: "Dùng đồ hiệu xa xỉ để phô trương ngoại hình" },
+          { key: "W", text: "Luôn tìm cách lấn lướt bạn bè trong các cuộc tranh luận" },
+          { key: "X", text: "Chỉ làm việc tốt khi có sự chứng kiến của thầy cô" }
+        ],
+        ans: "C"
+      }
+    ];
+
+    // Khởi tạo ma trận
+    const matrixEl = document.getElementById("matrix");
+    const cellElements = [];
+
+    rawMatrix.forEach((rowStr, rIdx) => {
+      for (let cIdx = 0; cIdx < rowStr.length; cIdx++) {
+        const char = rowStr[cIdx];
+        const cell = document.createElement("div");
+        cell.className = "cell";
+        cell.textContent = char;
+        cell.dataset.char = char;
+        matrixEl.appendChild(cell);
+        cellElements.push(cell);
+      }
+    });
+
+    // Mảng lưu trạng thái câu hỏi
+    const answeredStatus = new Array(questions.length).fill(false);
+
+    // Render danh sách câu hỏi
+    const qListEl = document.getElementById("questions-list");
+
+    questions.forEach((qItem, idx) => {
+      const qDiv = document.createElement("div");
+      qDiv.className = "q-item";
+      qDiv.id = `q-card-${idx}`;
+
+      const title = document.createElement("div");
+      title.className = "q-title";
+      title.textContent = qItem.q;
+      qDiv.appendChild(title);
+
+      const optGrid = document.createElement("div");
+      optGrid.className = "options-grid";
+
+      qItem.opts.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "btn-opt";
+        btn.innerHTML = `<span class="key-tag">${opt.key}</span> <span>${opt.text}</span>`;
+        btn.onclick = () => handleChoose(idx, opt.key, btn, qDiv);
+        optGrid.appendChild(btn);
+      });
+
+      qDiv.appendChild(optGrid);
+      qListEl.appendChild(qDiv);
+    });
+
+    function handleChoose(qIdx, chosenKey, btnEl, cardEl) {
+      const targetAns = questions[qIdx].ans;
+      const allBtns = cardEl.querySelectorAll(".btn-opt");
+
+      if (chosenKey === targetAns) {
+        // Đúng
+        allBtns.forEach(b => b.classList.remove("chosen-wrong"));
+        btnEl.classList.add("chosen-correct");
+        cardEl.classList.add("correct");
+        answeredStatus[qIdx] = true;
+      } else {
+        // Sai
+        btnEl.classList.add("chosen-wrong");
+        answeredStatus[qIdx] = false;
+      }
+      updateState();
+    }
+
+    function updateState() {
+      // Tìm các ký tự đúng từ các câu đã trả lời đúng
+      const activeLetters = new Set();
+      let correctCount = 0;
+      answeredStatus.forEach((isCorrect, idx) => {
+        if (isCorrect) {
+          activeLetters.add(questions[idx].ans);
+          correctCount++;
+        }
+      });
+
+      // Cập nhật ma trận
+      cellElements.forEach(cell => {
+        const char = cell.dataset.char;
+        if (activeLetters.has(char) && colorMap[char]) {
+          cell.style.backgroundColor = colorMap[char];
+          cell.style.color = "#ffffff";
+          cell.style.textShadow = "0 1px 2px rgba(0,0,0,0.4)";
+        } else {
+          cell.style.backgroundColor = "#ffffff";
+          cell.style.color = "#64748b";
+          cell.style.textShadow = "none";
+        }
+      });
+
+      document.getElementById("progress-text").textContent = `${correctCount}/20 câu đúng`;
+      document.getElementById("score-val").textContent = `Điểm: ${correctCount}/20`;
+    }
+
+    function resetGame() {
+      answeredStatus.fill(false);
+      document.querySelectorAll(".btn-opt").forEach(b => {
+        b.classList.remove("chosen-correct", "chosen-wrong");
+      });
+      document.querySelectorAll(".q-item").forEach(c => c.classList.remove("correct"));
+      updateState();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>
